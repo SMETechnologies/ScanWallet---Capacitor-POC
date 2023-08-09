@@ -1,0 +1,1 @@
+# ScanWallet - Capacitor POC
