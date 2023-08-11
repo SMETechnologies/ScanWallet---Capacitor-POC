@@ -5,7 +5,9 @@ const config: CapacitorConfig = {
   appName: 'scanwallet-capacitor-poc',
   webDir: 'out',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    url: "http://192.168.50.60:3000",
+    cleartext: true
   }
 };
 
