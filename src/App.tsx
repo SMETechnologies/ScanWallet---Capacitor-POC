@@ -2,6 +2,7 @@ import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
   IonIcon,
+  IonImg,
   IonLabel,
   IonRouterOutlet,
   IonTabBar,
@@ -33,15 +34,14 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import { useFilesystem } from '@capacitor-community/filesystem-react';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
-import jsQR from 'jsqr';
-import  PDFJS  from 'pdfjs-dist';
+import { PDFUtility } from './utils/pdfUtility';
+import { useState } from 'react';
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  const { readFile } = useFilesystem();
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null); // For storing the image data URL
 
   const handleGalleryClick = async () => {
     const result = await FilePicker.pickFiles({
@@ -49,31 +49,14 @@ const App: React.FC = () => {
       multiple: false,
     });
 
-  
-    const file = result.files[0]
-    if(file.mimeType && file.mimeType === 'application/pdf'){
-      console.log('YAAY a pdf'); 
-
-      const pdf = await PDFJS.getDocument({ data: file.blob }).promise;
-  
-  // Fetching the first page
-  const page = await pdf.getPage(1);
-  
-  // Setting the desired output resolution
-  const viewport = page.getViewport({ scale: 1 }); 
-
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-
-
-
-    }else if (file){
-      console.log('NOT PDF!'); 
+    const file = result.files[0];
+    if (file.mimeType && file.mimeType === 'application/pdf') {
+      const pdfImage = await PDFUtility.pdfToImage(file);
+    } else if (file && file.blob) {
+      const arrayBuffer = await file.blob?.arrayBuffer();
+      const bufferImage = Buffer.from(arrayBuffer);
     }
-  
-};
+  };
 
   return (
     <IonApp>
